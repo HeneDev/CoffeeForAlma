@@ -5,11 +5,17 @@ import path from 'path';
 import { Coffee } from '../models/CoffeeModel'
 import csv from 'csv-parser';
 
+function createCsvFile() {
+  const filePath = path.resolve(__dirname, '../assets/coffee-data.csv')
+  fs.writeFile(filePath, "", (err) => {
+    if (err) throw err;
+  })
+}
 
 async function readCsvFile() {
   const csvFilePath = path.resolve(__dirname, '../assets/coffee-data.csv');
   let promiseData: any = []
-  return new Promise((resolve, reject) => {
+  return new Promise<Coffee>((resolve, reject) => {
     fs.createReadStream(csvFilePath)
     .pipe(csv())
     .on('data', function(data) {
@@ -63,12 +69,16 @@ router.post("/add", async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json(err);
   }
-
 })
 
 // Get all coffees from the list
 router.get("/", async (req: Request, res: Response) => {
+  const csvFilePath = path.resolve(__dirname, '../assets/coffee-data.csv');
+
   try {
+    if (!fs.existsSync(csvFilePath)) {
+      createCsvFile();
+    }
     let promiseData = await readCsvFile();
     res.status(200).json(promiseData)
   } catch(err) {

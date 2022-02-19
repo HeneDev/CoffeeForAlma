@@ -34,6 +34,7 @@
     "color-name": "^1.1.4",
     "concat-map": "^0.0.1",
     "configstore": "^5.0.1",
+    "cors": "^2.8.5",
     "create-require": "^1.1.1",
     "crypto-random-string": "^2.0.0",
     "csv-parser": "^3.0.0",
