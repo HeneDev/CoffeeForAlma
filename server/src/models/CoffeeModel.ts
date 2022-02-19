@@ -1,4 +1,4 @@
-export class Coffee {
+export class ICoffee {
   name: string;
   price: number;
   weight: number;

@@ -2,20 +2,22 @@ const router = require("express").Router();
 import { Request, Response} from 'express'
 import fs from 'fs'
 import path from 'path';
-import { Coffee } from '../models/CoffeeModel'
+import { ICoffee } from '../models/CoffeeModel'
 import csv from 'csv-parser';
 
 function createCsvFile() {
   const filePath = path.resolve(__dirname, '../assets/coffee-data.csv')
+  // Creates an empty file to the assets folder
   fs.writeFile(filePath, "", (err) => {
     if (err) throw err;
   })
 }
 
-async function readCsvFile() {
+export async function readCsvFile() {
   const csvFilePath = path.resolve(__dirname, '../assets/coffee-data.csv');
   let promiseData: any = []
-  return new Promise<Coffee>((resolve, reject) => {
+  // Due to async function, returns a Promise.
+  return new Promise<ICoffee>((resolve) => {
     fs.createReadStream(csvFilePath)
     .pipe(csv())
     .on('data', function(data) {
@@ -27,7 +29,7 @@ async function readCsvFile() {
   })
 }
 
-function writeCsvFile(data: Coffee) {
+export function writeCsvFile(data: ICoffee) {
   const csvFilePath = path.resolve(__dirname, '../assets/coffee-data.csv');
 
   //Get file information
@@ -46,10 +48,11 @@ function writeCsvFile(data: Coffee) {
     append: isFileEmpty // If file is empty, add headers to the file. If not then append.
   });
 
+  // Record is added to the csv file
   const records = [
     { name: data.name, price: data.price, weight: data.weight, roastGrade: data.roastGrade },
   ]
-
+  // Writes to the file
   csvWriter.writeRecords(records)      
 } 
 
@@ -58,7 +61,7 @@ router.post("/add", async (req: Request, res: Response) => {
   try {
     const { name, price, weight, roastGrade } = req.body
 
-    const newCoffee = new Coffee();
+    const newCoffee = new ICoffee();
     newCoffee.name = name;
     newCoffee.price = price;
     newCoffee.weight = weight;
@@ -76,6 +79,7 @@ router.get("/", async (req: Request, res: Response) => {
   const csvFilePath = path.resolve(__dirname, '../assets/coffee-data.csv');
 
   try {
+    //Check if the file exists. If it doesnt, create the file
     if (!fs.existsSync(csvFilePath)) {
       createCsvFile();
     }
