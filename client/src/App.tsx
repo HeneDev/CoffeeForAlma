@@ -4,52 +4,21 @@ import CoffeeForm from './components/Form/CoffeeForm'
 import CoffeeList from './components/CoffeeList/CoffeeList'
 import { Col, Container, Row } from 'react-bootstrap'
 import dataService from './services/data'
-
-export type ICoffee = {
-  name: string,
-  price: number,
-  weight: number,
-  roastGrade: number  
-}
+import { ICoffee } from './interfaces/ICoffee'
 
 const App: React.FC = () => {
-  
-  const [name, setName] = useState<string | undefined | null>()
-  const [price, setPrice] = useState<number | undefined | null>()
-  const [weight, setWeight] = useState<number | undefined | null>()
-  const [roastGrade, setRoastGrade] = useState<number | undefined | null>(1)
   const [coffeeList, setCoffeeList] = useState<ICoffee[]>([])
   const [loading, setLoading] = useState<boolean>(false) // This is used to showing a "loading.." message on CoffeeList if we aren't done getting all the data
 
-  const handleAddingNewCoffee = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    try {
-      const newObject: ICoffee = {
-        name: name,
-        price: price,
-        weight: weight,
-        roastGrade: roastGrade
-      }
-
-      await dataService.addNewCoffee(newObject)
-      // After initializing the new object, reset all properties
-      setName('')
-      setPrice(null)
-      setWeight(null)
-      setRoastGrade(1)
-
-      // The React way to concatinating arrays
-      const newList = [newObject, ...coffeeList]
-      setCoffeeList(newList)
-    } catch(err) {
-      console.log(err)
-    }
-  }
-
   // First time the page loads, retrieve all data from the server
   useEffect(() => {
+    // Fix to memory leak warning for tests
+    let cancel = false
+
     const getCoffees = async () => {
       try {
+        // Used to make sure the component unmounts after it completes the task. Mainly used for testing.
+        if (cancel) return
         setLoading(true)
         const newList: ICoffee[] = []
         const response = await dataService.getAll()
@@ -64,6 +33,11 @@ const App: React.FC = () => {
     }
     setLoading(false)
     getCoffees()
+
+    // Ensures that the component unmounts after its done
+    return () => {
+      cancel = true
+    }
   }, [])
 
   return (
@@ -74,15 +48,8 @@ const App: React.FC = () => {
         <Row>
           <Col>
             <CoffeeForm 
-            name={name} 
-            setName={setName} 
-            price={price} 
-            setPrice={setPrice} 
-            weight={weight} 
-            setWeight={setWeight} 
-            roastGrade={roastGrade} 
-            setRoastGrade={setRoastGrade}
-            handleAddingNewCoffee={handleAddingNewCoffee}/>
+            coffeeList={coffeeList}
+            setCoffeeList={setCoffeeList}/>
           </Col>
           <Col>
             <CoffeeList 

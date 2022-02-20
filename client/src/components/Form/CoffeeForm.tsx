@@ -1,29 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Form, Button } from 'react-bootstrap'
+import dataService from '../../services/data'
+import { ICoffee } from '../../interfaces/ICoffee'
 
 interface Props {
-  name: string
-  price: number | undefined
-  weight: number | undefined
-  roastGrade: number | undefined
-  setName: (value: string) => void
-  setPrice: (value: number) => void
-  setWeight: (value: number) => void
-  setRoastGrade: (value: number) => void
-  handleAddingNewCoffee: (event: React.FormEvent<HTMLFormElement>) => void
+  coffeeList: ICoffee[]
+  setCoffeeList: (value: ICoffee[]) => void
 }
 
-const CoffeeForm: React.FC<Props> = ({
-  name,
-  price, 
-  weight, 
-  roastGrade, 
-  setName, 
-  setPrice, 
-  setWeight, 
-  setRoastGrade, 
-  handleAddingNewCoffee
-}) => {
+const CoffeeForm: React.FC<Props> = ({coffeeList, setCoffeeList}) => {
+  const [name, setName] = useState<string | undefined | null>()
+  const [price, setPrice] = useState<number | undefined | null>()
+  const [weight, setWeight] = useState<number | undefined | null>()
+  const [roastGrade, setRoastGrade] = useState<number | undefined | null>(1)
+
   const onNameChange = (newName: string) => {
     setName(newName)
   }
@@ -47,13 +37,39 @@ const CoffeeForm: React.FC<Props> = ({
     setRoastGrade(1)
   }
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    try {
+      const newObject: ICoffee = {
+        name: name,
+        price: price,
+        weight: weight,
+        roastGrade: roastGrade
+      }
+
+      await dataService.addNewCoffee(newObject)
+      // After initializing the new object, reset all properties
+      setName('')
+      setPrice(null)
+      setWeight(null)
+      setRoastGrade(1)
+
+      // The React way to concatinating arrays
+      const newList: ICoffee[] = []
+      newList.push(...coffeeList, newObject)
+      setCoffeeList(newList)
+    } catch(err) {
+      console.log(err)
+    }
+  }
+
   return (
-    <Form onSubmit={handleAddingNewCoffee}>
+    <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
         <Form.Label>Name</Form.Label>
         <Form.Control 
         type="text"
-        data-testid="name"
+        data-testid="nameTest"
         placeholder="Enter name" 
         value={name ?? ''}
         onChange={(event) => onNameChange(event.target.value)}
@@ -64,7 +80,9 @@ const CoffeeForm: React.FC<Props> = ({
         <Form.Label>Price in euros</Form.Label>
         <Form.Control 
         type="number"
-        data-testid="price"
+        min={0}
+        max={1000000}
+        data-testid="priceTest"
         placeholder="Enter price" 
         value={price ?? ''} 
         onChange={(event) => {
@@ -78,7 +96,9 @@ const CoffeeForm: React.FC<Props> = ({
         <Form.Label>Weight in grams</Form.Label>
         <Form.Control 
         type="number"
-        data-testid="weight" 
+        min={0}
+        max={1000000}
+        data-testid="weightTest" 
         placeholder="Enter weight" 
         value={weight ?? ''}
         onChange={(event) => {
@@ -92,7 +112,7 @@ const CoffeeForm: React.FC<Props> = ({
         <Form.Label>Roast grade from 1 to 5</Form.Label>
         <Form.Select
         value={roastGrade}
-        data-testid="roastGrade"
+        data-testid="roastGradeTest"
         onChange={(event) => {
           const { value } = event.target
           onRoastGradeChange(value === '' ? undefined : +value)

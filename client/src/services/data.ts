@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ICoffee } from '../App'
+import { ICoffee } from '../interfaces/ICoffee'
 const baseUrl = 'http://localhost:5000/coffees'
 
 const getAll = async() => {
