@@ -8,7 +8,7 @@
 #### Cloning repository and changing directory:
 
 ```
-$ git clone git@github.com:HeneDev/CoffeeForAlma.git
+git clone git@github.com:HeneDev/CoffeeForAlma.git
 cd CoffeeForAlma
 ```
 
