@@ -12,13 +12,8 @@ const App: React.FC = () => {
 
   // First time the page loads, retrieve all data from the server
   useEffect(() => {
-    // Fix to memory leak warning for tests
-    let cancel = false
-
     const getCoffees = async () => {
       try {
-        // Used to make sure the component unmounts after it completes the task. Mainly used for testing.
-        if (cancel) return
         setLoading(true)
         const newList: ICoffee[] = []
         const response = await dataService.getAll()
@@ -33,11 +28,6 @@ const App: React.FC = () => {
     }
     setLoading(false)
     getCoffees()
-
-    // Ensures that the component unmounts after its done
-    return () => {
-      cancel = true
-    }
   }, [])
 
   return (
