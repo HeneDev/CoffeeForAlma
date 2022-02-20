@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import AppNavbar from './components/Navbar/Navbar'
-import CoffeeForm from './components/Navbar/Form/CoffeeForm'
+import CoffeeForm from './components/Form/CoffeeForm'
 import CoffeeList from './components/CoffeeList/CoffeeList'
 import { Col, Container, Row } from 'react-bootstrap'
 import dataService from './services/data'
@@ -13,14 +13,15 @@ export type ICoffee = {
 }
 
 const App: React.FC = () => {
+  
   const [name, setName] = useState<string | undefined | null>()
   const [price, setPrice] = useState<number | undefined | null>()
   const [weight, setWeight] = useState<number | undefined | null>()
-  const [roastGrade, setRoastGrade] = useState<number | undefined | null>()
+  const [roastGrade, setRoastGrade] = useState<number | undefined | null>(1)
   const [coffeeList, setCoffeeList] = useState<ICoffee[]>([])
-  const [loading, setLoading] = useState<Boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false) // This is used to showing a "loading.." message on CoffeeList if we aren't done getting all the data
 
-  const handleAddingNewCoffee = async (e: any) => {
+  const handleAddingNewCoffee = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       const newObject: ICoffee = {
@@ -31,15 +32,17 @@ const App: React.FC = () => {
       }
 
       await dataService.addNewCoffee(newObject)
-
+      // After initializing the new object, reset all properties
       setName('')
       setPrice(null)
       setWeight(null)
-      setRoastGrade(null)
+      setRoastGrade(1)
+
+      // The React way to concatinating arrays
       const newList = [newObject, ...coffeeList]
-      setCoffeeList(newList);
+      setCoffeeList(newList)
     } catch(err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
@@ -47,9 +50,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const getCoffees = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         const newList: ICoffee[] = []
         const response = await dataService.getAll()
+        // Loop through the received response and add each object to a list
         for (let i = 0; i < response.length; i++) {
           newList.push(response[i])
         }
@@ -59,7 +63,7 @@ const App: React.FC = () => {
       }
     }
     setLoading(false)
-    getCoffees();
+    getCoffees()
   }, [])
 
   return (
