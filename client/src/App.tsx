@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import AppNavbar from './components/Navbar/Navbar'
 import CoffeeForm from './components/Form/CoffeeForm'
-import CoffeeList from './components/CoffeeList/CoffeeList'
+import CoffeeList from './components/List/CoffeeList'
 import { Col, Container, Row } from 'react-bootstrap'
 import dataService from './services/data'
 import { ICoffee } from './interfaces/ICoffee'
