@@ -7,7 +7,7 @@ describe('Route testing', () => {
   test('GET/ route should status code 200', async() => {
     await axios.get(baseUrl)
     .then(r => {
-      expect(r.status).toBeGreaterThanOrEqual(200);
+      expect(r.status).toBeGreaterThanOrEqual(200)
       expect(r.status).toBeLessThan(300)
     })
   })
@@ -21,7 +21,7 @@ describe('Route testing', () => {
     }
     await axios.post(baseUrl + '/add', dummyObject)
     .then(r => {
-      expect(r.status).toBeGreaterThanOrEqual(200);
+      expect(r.status).toBeGreaterThanOrEqual(200)
       expect(r.status).toBeLessThan(300)
       expect(r.data).toBeDefined()
     })
